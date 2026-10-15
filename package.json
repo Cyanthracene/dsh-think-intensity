@@ -1,0 +1,48 @@
+{
+  "name": "dsh-think-intensity",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DSH 思考强度滑块：把「推理等级」变成一条会呼吸、会飞光点、拉满还会流彩的科幻滑块",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "reasoning",
+    "thinking",
+    "slider"
+  ],
+  "homepage": "https://github.com/Cyanthracene/dsh-think-intensity#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cyanthracene/dsh-think-intensity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Cyanthracene/dsh-think-intensity/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "license": "MIT"
+}
