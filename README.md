@@ -7,11 +7,20 @@
 
 **快速开始**
 
+不需要 git（推荐）：
+
+```powershell
+npm install https://codeload.github.com/Cyanthracene/dsh-think-intensity/tar.gz/refs/heads/main
+```
+
+或者 clone 下来改（需要 git）：
+
 ```powershell
 git clone https://github.com/Cyanthracene/dsh-think-intensity.git
 dsh plugin --profile desktop add <克隆目录的绝对路径>
-# 完全退出并重启 DSH（不是刷新页面）
 ```
+
+装完**完全退出并重启 DSH**（不是刷新页面）。详见 [安装 / 卸载](#安装--卸载)。
 
 自测（零依赖）：`node test/smoke.mjs` → `OK: smoke test passed`
 
@@ -294,28 +303,64 @@ low rung custom  : 0/6/4/4 | low default 40/0/0/0                   ← 最低�
 
 ## 安装 / 卸载
 
+### 方式 A：不需要 git（推荐给只想用的人）
+
+包管理器直接抓 GitHub 的 tarball，**完全不依赖 git**：
+
+```powershell
+npm install https://codeload.github.com/Cyanthracene/dsh-think-intensity/tar.gz/refs/heads/main
+```
+
+也可以让 DSH 用这个地址安装（`<地址>` 换成上面那条 URL）：
+
+```powershell
+dsh plugin --profile desktop add https://codeload.github.com/Cyanthracene/dsh-think-intensity/tar.gz/refs/heads/main
+```
+
+### 方式 B：先 clone（想改代码、想跟着更新）
+
 ```powershell
 git clone https://github.com/Cyanthracene/dsh-think-intensity.git
 dsh plugin --profile desktop add <克隆下来的目录绝对路径>
 ```
 
-装完必须**完全退出并重启 DSH**（不是刷新页面）——原因见下面的警告。
+让它以 `link:` 方式挂进 profile 后，**直接改那个目录里的文件即可继续同步**，不需要重装。
 
-以 `link:` 方式安装后，直接改这个目录里的文件即可继续同步；它在 profile 的
-`package.json` 里体现为：
+### ⚠️ 方式选择的关键：`git` 是不是必须的
 
-- `dependencies`：`"dsh-think-intensity": "link:<该目录>"`
+**用 git 地址（`git+https://...` 或 `github:用户/仓库`）安装时，包管理器需要调用系统里的 `git`。**
+Windows 默认**不带** git，所以这条会直接失败，报错长这样：
+
+```
+npm error syscall spawn git
+npm error path git
+npm error enoent This is related to npm not being able to find a file.
+```
+
+遇到这个报错，就用**方式 A 的 tarball 地址**，或者先装 git（`winget install Git.Git`）。
+
+### 装完必须重启
+
+**完全退出并重启 DSH**（不是刷新页面）。原因：
+
+> ⚠️ 桌面端的 `__DSH_BOOT__` 注入表是**宿主启动时收集一次、之后一直用内存里那份**的，
+> 所以新装 / 新删 / 新禁用插件后必须重启才会生效。
+
+它在 profile 的 `package.json` 里体现为：
+
+- `dependencies`：`"dsh-think-intensity": "link:<该目录>"`（方式 B）或版本/tarball 记录（方式 A）
 - `dsh.profile.bundles`：追加 `dsh-think-intensity`
 
 （该 profile 用 bundles 列表启用插件，所以 `cordis.patch.yml` 里**不会**出现插入行；
 本包自带的 `cordis.patch.yml` 是给"把本包当作 bundle patch 层"的宿主用的。）
 
-卸载：把 `dsh-think-intensity` 从 `dsh.profile.bundles` 与 `dependencies` 中移除，重启 DSH。
+### 卸载
 
-> ⚠️ 桌面端的 `__DSH_BOOT__` 注入表是**宿主启动时收集一次、之后一直用内存里那份**的，
-> 所以新装 / 新删 / 新禁用插件后必须**完全退出并重启 DSH**（不是刷新页面）才会生效。
->
-> ⚠️ 另外：入口 `lib/client.js` 由宿主以**组合 URL（combo URL）**下发且会被持久缓存，
+把 `dsh-think-intensity` 从 `dsh.profile.bundles` 与 `dependencies` 中移除，重启 DSH。
+
+### 开发时的一条省事规则
+
+> ⚠️ 入口 `lib/client.js` 由宿主以**组合 URL（combo URL）**下发且会被持久缓存，
 > 所以**改入口必须重启**；而 `lib/client.view.js` 是通过带 `?rev=` 的 chunk 通道加载的，
 > **改视图刷新页面即可**。这条差异能省掉大量无谓重启。
 
